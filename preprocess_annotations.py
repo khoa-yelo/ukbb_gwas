@@ -36,7 +36,7 @@ def main():
     gene_sequence_dict = df_refseq.set_index("ID").to_dict()["CDS"]
 
     DATA_PATH = "/orange/sai.zhang/UKBB/vcf_qc/EUR/"
-    ANNOT_PATH = "/orange/sai.zhang/khoa/data/UKBB/annots2"
+    ANNOT_PATH = "/orange/sai.zhang/khoa/data/UKBB/annots"
     os.makedirs(ANNOT_PATH, exist_ok = True)
     df_annot_paths = glob.glob(join(DATA_PATH, "*.hg38_multianno.txt"))
     df_annot_out_paths = []
