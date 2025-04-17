@@ -1,9 +1,9 @@
 #!/bin/bash 
 #SBATCH --ntasks=1                    # Run on a single CPU
-#SBATCH --mem=30gb                     # Job memory request
+#SBATCH --mem=10gb                     # Job memory request
 #SBATCH --time=2:00:00               # Time limit hrs:min:sec
 #SBATCH --output=logs/parse_vcf_%j.log   # Standard output and error log
-#SBATCH --array=0-50
+#SBATCH --array=0-2000
 
 pwd; hostname; date
 
@@ -12,10 +12,10 @@ env_path=$CONDA_ENVS/gwas/bin/
 export PATH=$env_path:$PATH
 
 # read input output folder
-INPUT_FOLDER=$1
-OUTPUT_FOLDER=$2
+INPUT_FOLDER=$1  #/orange/sai.zhang/khoa/data/UKBB/chrX_splits_2000
+OUTPUT_FOLDER=$2 #/orange/sai.zhang/khoa/data/UKBB/chrX_splits_2000_variants
 
-echo "Input folder: $INPUT_FOLDER"
+echo "Input folder: $INPUT_FOLDER"  
 echo "Output folder: $OUTPUT_FOLDER"
 
 # make output folder
@@ -37,6 +37,12 @@ vcf_file=${vcf_files[$SLURM_ARRAY_TASK_ID]}
 
 # Set output file name
 output_file="${OUTPUT_FOLDER}/$(basename ${vcf_file%.vcf.gz}).sample_variants"
+
+# skip if output file already exists
+if [ -f "${output_file}.pklz" ]; then
+    echo "Output file $output_file already exists. Skipping."
+    exit 0
+fi
 
 # Run the Python script
 python parse_sample_variants.py --vcf_file "$vcf_file" --out_file "$output_file"
