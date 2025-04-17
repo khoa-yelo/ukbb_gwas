@@ -58,6 +58,8 @@ class NuChangeParser:
             del seq[self.pos[0]-1:self.pos[-1]]
         elif self.change_type == "sub":
             seq[self.pos[0]-1:self.pos[0]-1 + len(self.ref)] = self.alt
+        elif self.change_type == "dup":
+            seq[self.pos[0]:self.pos[0]] = self.ref
         return str(seq)
 
     def get_variant_postions(self, value):

@@ -1,7 +1,7 @@
 #!/bin/bash 
 #SBATCH --ntasks=1                    # Run on a single CPU
-#SBATCH --mem=20gb                     # Job memory request
-#SBATCH --time=2:00:00               # Time limit hrs:min:sec
+#SBATCH --mem=30gb                     # Job memory request
+#SBATCH --time=9:00:00               # Time limit hrs:min:sec
 #SBATCH --output=logs/variant_exome_%j.log   # Standard output and error log
 #SBATCH --array=0-50
 
