@@ -7,8 +7,20 @@ import pickle
 import os
 import time
 
+# default result dict with zeros (1152,) np.array
+default_result = {
+    "max": torch.zeros((1152,), dtype=torch.float32).detach().cpu().numpy(),
+    "mean": torch.zeros((1152,), dtype=torch.float32).detach().cpu().numpy(),
+    "max_middle_layer_12": torch.zeros((1152,), dtype=torch.float32).detach().cpu().numpy(),
+    "mean_middle_layer_12": torch.zeros((1152,), dtype=torch.float32).detach().cpu().numpy()
+}
 
 def embed_protein(client, protein_seq, middle_layer = 12):
+
+    # Check if the protein sequence is empty or NaN
+    # If so, return the default result
+    if not protein_seq or pd.isna(protein_seq):
+        return default_result
     protein = ESMProtein(sequence=protein_seq)
     protein_tensor = client.encode(protein)
     logits_output = client.logits(
@@ -44,6 +56,7 @@ def main():
     if not os.path.exists(os.path.dirname(output_path)):
         os.makedirs(os.path.dirname(output_path))
     # Read the input file
+    print(f"Reading input file: {input_path}", flush=True)
     df = pd.read_csv(input_path)
     proteins = df.Protein.str.split("*").str[0].values
     ids = df.ID.values
