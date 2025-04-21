@@ -64,8 +64,6 @@ class EmbeddingLoader:
     def __init__(self, database_path, metric = "mean"):
         self.database_path = database_path
         self.metric = metric
-        assert self.metric in ["mean", "max", "mean_middle_layer", "max_middle_layer"],\
-                'metric must be one of these options: "mean", "max", "mean_middle_layer", "max_middle_layer"'
         self.embeddings = self.load_embeddings()
         
     def load_embeddings(self):
