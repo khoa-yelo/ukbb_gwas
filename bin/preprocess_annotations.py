@@ -1,3 +1,7 @@
+"""
+Preprocess the annotation files from ANNOVAR, 
+keep only the relevant columns, and filter out synonymous variants.
+"""
 import pandas as pd 
 import numpy as np
 from os.path import join, basename
@@ -29,14 +33,16 @@ def process_annotation_file(df_annot, gene_sequence_dict, refseq_genes):
 def main():
     
     print("Starting preprocessing annotations")
-    refseq_data_path = "/orange/sai.zhang/khoa/data/RefSeqGene/GRCh38_latest_rna.gbff.tsv"
+    my_folder = os.getenv("KHOA")
+    refseq_data_path = os.path.join(my_folder, "data/RefSeqGene/GRCh38_latest_rna.gbff.tsv")
     df_refseq = pd.read_csv(refseq_data_path, sep = "\t")
     df_refseq["ID"] = df_refseq["Accession"].apply(lambda x: x.split(".")[0])
     refseq_genes = set(df_refseq["ID"].unique())
     gene_sequence_dict = df_refseq.set_index("ID").to_dict()["CDS"]
 
-    DATA_PATH = "/orange/sai.zhang/UKBB/vcf_qc/EUR/"
-    ANNOT_PATH = "/orange/sai.zhang/khoa/data/UKBB/annots"
+    DATA_PATH = os.getenv("RAW_DATA")
+    ANNOT_PATH = os.getenv("PROCESSED_DATA")
+    ANNOT_PATH = os.path.join(ANNOT_PATH, "annots")
     os.makedirs(ANNOT_PATH, exist_ok = True)
     df_annot_paths = glob.glob(join(DATA_PATH, "*.hg38_multianno.txt"))
     df_annot_out_paths = []

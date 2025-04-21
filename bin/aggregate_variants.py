@@ -29,6 +29,7 @@ def process_variant_mapping(df: pd.DataFrame, chromosome: str) -> pd.DataFrame:
 
 def concat_split_files(folder: str, chromosome: str) -> pd.DataFrame:
     df_splits = []
+    print(f"Looking for split files in {folder}", flush=True)
     for filename in os.listdir(folder):
         if filename.startswith('split') and filename.endswith('.tsv'):
             print(f"Processing split file: {filename}", flush=True)

@@ -1,3 +1,9 @@
+"""
+Module to reconstruct exome sequences from variant data.
+This module reads variant data, applies mutations to the reference sequences,
+and outputs the mutated sequences in a specified format.
+"""
+
 import pandas as pd
 import numpy as np
 import argparse
@@ -5,8 +11,6 @@ import pickle
 import zlib
 import re
 from Bio.Seq import MutableSeq
-import sqlite3
-import os
 
 class NuChangeParser:
 

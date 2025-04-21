@@ -1,4 +1,13 @@
 #!/usr/bin/env python3
+
+"""
+Index Exome data to save space
+Exome data has form 
+Sample, rna_id, seq
+
+Unique seq across all sample is obtained and assigned index
+"""
+
 import argparse
 from pathlib import Path
 import pandas as pd

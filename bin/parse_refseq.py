@@ -1,5 +1,11 @@
+"""
+Parse GenBank Flat File (GBFF) to extract CDS 
+Using GRCh38_latest_rna.fna.gz                     2024-08-27 09:57  129M 
+https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/annotation/GRCh38_latest/refseq_identifiers/
+"""
 from Bio import SeqIO
 import pandas as pd
+import os
 
 def parse_gbff(file_path):
     """
@@ -43,10 +49,13 @@ def parse_gbff(file_path):
 
     return parsed_data
 
-# Example usage
-parsed_results = parse_gbff("/orange/sai.zhang/khoa/data/RefSeqGene/GRCh38_latest_rna.gbff")
+def main():
+    my_folder = os.getenv("KHOA")
+    parsed_results = parse_gbff(os.path.join(my_folder, "data/RefSeqGene/GRCh38_latest_rna.gbff"))
+    df_ref = pd.DataFrame(parsed_results)
+    # chunk from Start to End of Sequence
+    df_ref["CDS"] = df_ref.apply(lambda x: x["Sequence"][x["Start"]:x["End"]], axis = 1)
+    df_ref.to_csv(os.path.join(my_folder, "data/RefSeqGene/GRCh38_latest_rna.gbff.tsv"), sep = "\t", index = False)
 
-df_ref = pd.DataFrame(parsed_results)
-# chunk from Start to End of Sequence
-df_ref["CDS"] = df_ref.apply(lambda x: x["Sequence"][x["Start"]:x["End"]], axis = 1)
-df_ref.to_csv("/orange/sai.zhang/khoa/data/RefSeqGene/GRCh38_latest_rna.gbff.tsv", sep = "\t", index = False)
+if __name__ == "__main__":
+    main()

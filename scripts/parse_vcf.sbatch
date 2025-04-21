@@ -1,6 +1,6 @@
 #!/bin/bash 
 #SBATCH --ntasks=1                    # Run on a single CPU
-#SBATCH --mem=10gb                     # Job memory request
+#SBATCH --mem=15gb                     # Job memory request
 #SBATCH --time=2:00:00               # Time limit hrs:min:sec
 #SBATCH --output=logs/parse_vcf_%j.log   # Standard output and error log
 #SBATCH --array=0-2000
@@ -12,8 +12,8 @@ env_path=$CONDA_ENVS/gwas/bin/
 export PATH=$env_path:$PATH
 
 # read input output folder
-INPUT_FOLDER=$1  #/orange/sai.zhang/khoa/data/UKBB/chrX_splits_2000
-OUTPUT_FOLDER=$2 #/orange/sai.zhang/khoa/data/UKBB/chrX_splits_2000_variants
+INPUT_FOLDER=$1  #$PROCESSED_DATA/chrX_splits_2000
+OUTPUT_FOLDER=$2 #$PROCESSED_DATA/chrX_splits_2000_variants
 
 echo "Input folder: $INPUT_FOLDER"  
 echo "Output folder: $OUTPUT_FOLDER"
@@ -45,6 +45,6 @@ if [ -f "${output_file}.pklz" ]; then
 fi
 
 # Run the Python script
-python parse_sample_variants.py --vcf_file "$vcf_file" --out_file "$output_file"
+python $REPO/ukbb_gwas/bin/parse_vcf.py --vcf_file "$vcf_file" --out_file "$output_file"
 
 echo "Processed $vcf_file into $output_file"

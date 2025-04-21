@@ -9,6 +9,8 @@ pwd; hostname; date
 
 module load bcftools
 
+### This script is used to index VCF files using bcftools.
+
 # Get all VCF files in RAW_DATA folder
 # vcf_dir=$RAW_DATA
 vcf_dir=$1

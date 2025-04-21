@@ -1,18 +1,21 @@
 #!/bin/bash 
 #SBATCH --ntasks=1                    # Run on a single CPU
 #SBATCH --mem=1gb                   # Job memory request
-#SBATCH --time=12:00:00               # Time limit hrs:min:sec
+#SBATCH --time=4:00:00               # Time limit hrs:min:sec
 #SBATCH --output=logs/split_vcf_sample_%j.log   # Standard output and error log
-#SBATCH --array=0-200                  # Array range
+#SBATCH --array=0-50                  # Array range
 
 pwd; hostname; date
 
 module load bcftools
 
+### This script splits a VCF file into multiple smaller VCF files containing a subset of samples.
+### It is designed to be run as a SLURM job array, where each task processes a different subset of samples.
+
 # Input parameters
-INPUT_VCF="/orange/sai.zhang/UKBB/vcf_qc/EUR/ukb23157_cX_v1.QC3.vcf.gz"  # Path to the input VCF file
-OUTPUT_DIR="/orange/sai.zhang/khoa/data/UKBB/chrX_splits_200"       # Directory to save split VCFs
-NUM_SPLITS=200                         # Number of splits to create
+INPUT_VCF="$RAW_DATA/ukb23157_c17_v1.QC3.vcf.gz"  # Path to the input VCF file
+OUTPUT_DIR="$PROCESSED_DATA/chr17_splits"       # Directory to save split VCFs
+NUM_SPLITS=50                         # Number of splits to create
 
 # Create the output directory if it doesn't exist
 mkdir -p "$OUTPUT_DIR"

@@ -1,9 +1,9 @@
 #!/bin/bash 
 #SBATCH --ntasks=1                    # Run on a single CPU
-#SBATCH --mem=30gb                     # Job memory request
-#SBATCH --time=9:00:00               # Time limit hrs:min:sec
-#SBATCH --output=logs/variant_exome_%j.log   # Standard output and error log
-#SBATCH --array=0-50
+#SBATCH --mem=20gb                     # Job memory request
+#SBATCH --time=4:00:00               # Time limit hrs:min:sec
+#SBATCH --output=logs/reconstruct_exome_%j.log   # Standard output and error log
+#SBATCH --array=0-2000
 
 pwd; hostname; date
 
@@ -12,9 +12,9 @@ env_path=$CONDA_ENVS/gwas/bin/
 export PATH=$env_path:$PATH
 
 # read input output folder
-INPUT_FOLDER=$1 # /orange/sai.zhang/khoa/data/UKBB/chr22_splits_variants
-OUTPUT_FOLDER=$2 # /orange/sai.zhang/khoa/data/UKBB/chr22_splits_exomes
-ANNOT_FILE=$3 # /orange/sai.zhang/khoa/data/UKBB/annots/c22_annot.tsv
+INPUT_FOLDER=$1 # $PROCESSED_DATA/chr22_splits_variants
+OUTPUT_FOLDER=$2 # $PROCESSED_DATA/chr22_splits_exomes
+ANNOT_FILE=$3 # $PROCESSED_DATA/annots/c22_annot.tsv
 
 echo "Input folder: $INPUT_FOLDER"
 echo "Output folder: $OUTPUT_FOLDER"
@@ -41,6 +41,6 @@ variant_file=${variant_files[$SLURM_ARRAY_TASK_ID]}
 output_file="${OUTPUT_FOLDER}/$(basename ${variant_file%.pklz}).exome.tsv"
 
 # Run the Python script
-python variant_to_exome.py --variant_file "$variant_file" --output_file "$output_file" --annot_file "$ANNOT_FILE"
+python $REPO/ukbb_gwas/bin/reconstruct_exome.py --variant_file "$variant_file" --output_file "$output_file" --annot_file "$ANNOT_FILE"
 
 echo "Processed $variant_file into $output_file"

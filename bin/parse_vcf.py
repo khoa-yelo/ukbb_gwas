@@ -1,11 +1,12 @@
+"""
+Parse VCF file and extract sample variants
+Only save non-zero genotypes
+"""
 import os
-from os.path import join, basename
+from os.path import join
 from collections import defaultdict
-import sys
 import time
-from ast import literal_eval
 import numpy as np
-import pandas as pd
 import pickle
 import zlib
 import argparse
