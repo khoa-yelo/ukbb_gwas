@@ -7,7 +7,13 @@ import numpy as np
 from os.path import join, basename
 import glob
 import os
+import argparse
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Preprocess ANNOVAR annotation files")
+    parser.add_argument('--data_path', type=str, required=True, help="Path to the raw data directory")
+    parser.add_argument('--out_path', type=str, required=True, help="Path to the processed data directory")
+    return parser.parse_args()
 
 def process_annotation_file(df_annot, gene_sequence_dict, refseq_genes):
     selected_cols = ['Chr', 'Start', 'End', 'Ref', 'Alt', 'Func.refGene', 'Gene.refGene', \
@@ -32,6 +38,12 @@ def process_annotation_file(df_annot, gene_sequence_dict, refseq_genes):
 
 def main():
     
+    args = parse_args()
+    DATA_PATH = args.data_path
+    ANNOT_PATH = args.out_path
+    ANNOT_PATH = os.path.join(ANNOT_PATH, "annots")
+    os.makedirs(ANNOT_PATH, exist_ok = True)
+    
     print("Starting preprocessing annotations")
     my_folder = os.getenv("KHOA")
     refseq_data_path = os.path.join(my_folder, "data/RefSeqGene/GRCh38_latest_rna.gbff.tsv")
@@ -40,9 +52,6 @@ def main():
     refseq_genes = set(df_refseq["ID"].unique())
     gene_sequence_dict = df_refseq.set_index("ID").to_dict()["CDS"]
 
-    DATA_PATH = os.getenv("RAW_DATA")
-    ANNOT_PATH = os.getenv("PROCESSED_DATA")
-    ANNOT_PATH = os.path.join(ANNOT_PATH, "annots")
     os.makedirs(ANNOT_PATH, exist_ok = True)
     df_annot_paths = glob.glob(join(DATA_PATH, "*.hg38_multianno.txt"))
     df_annot_out_paths = []
