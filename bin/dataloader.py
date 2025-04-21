@@ -1,24 +1,3 @@
-"""
-Module for loading and processing exome data and embeddings from a SQLite database and HDF5 file.
-Generating a matrix of dim (NUM_TRANSCRIPT, EMBEDDING_DIM) for each sample.
-"""
-import os
-from os.path import join
-import sys
-import time
-from tqdm import tqdm
-REPO = join(os.getenv("REPO"), "ukbb_gwas/bin")
-sys.path.insert(0, REPO)
-
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-
-import h5py
-import json
-
-from construct_sqlite import SQLiteDB
-
 class VariantLoader:
     
     def __init__(self, database_path):
@@ -77,11 +56,14 @@ class EmbeddingLoader:
     
     def get_embeddings(self, chromosome:str, ids:list):
         return self.embeddings[chromosome][ids,:]
-        
+    
+    def get_ref_embeddings(self):
+        return self.embeddings["ref"][:]
 
+    
 class ExomeLoader:
     
-    def __init__(self, variant_loader, embedding_loader, reference_db):
+    def __init__(self, variant_loader, embedding_loader, reference_db, metric = "mean"):
         self.variant_db = variant_loader
         self.embedding_db = embedding_loader
         self.reference_db = pd.read_csv(reference_db)
@@ -116,6 +98,9 @@ class ExomeLoader:
             chrom_map = self.get_mappings(full_variants)
             chrom_maps[sample] = chrom_map
         return chrom_maps
+
+    def get_ref_embeddings(self):
+        return self.embedding_db.get_ref_embeddings()
     
     @staticmethod
     def get_mappings(variants):
