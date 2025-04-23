@@ -26,7 +26,11 @@ def get_unique_column_values(input_dir: Path, column_index: int) -> set:
         print(f"Processing file for unique values: {file_path}", flush=True)
         try:
             # Read only the specified column; assumes files have no header.
-            df = pd.read_csv(file_path, sep="\t", header=None, usecols=[column_index])
+            #TODO: fix by remove header = None, Need to fix 
+            # pickle embeddings keys
+            # variants_id_map.csv
+            # split_1_id.csv, etc
+            df = pd.read_csv(file_path, sep="\t", usecols=[column_index])
             # Update the set with unique values from the target column.
             unique_values.update(df.iloc[:, 0].dropna().unique())
         except Exception as e:
@@ -102,9 +106,9 @@ def main():
     print(f"Total unique values found in column {args.column_index + 1}: {len(unique_vals)}")
     
     unique_vals_df = pd.DataFrame(unique_vals, columns=["CDS"])
-    unique_vals_df["ID"] = unique_vals_df.index
     # Remove entries where the sequence equals "seq" (ignoring case)
     unique_vals_df = unique_vals_df[unique_vals_df["CDS"].str.lower() != "seq"]
+    unique_vals_df["ID"] = unique_vals_df.index
     unique_vals_df["Protein"] = unique_vals_df["CDS"].apply(translate)
     
     mapping_output_path = output_dir / args.mapping_output
