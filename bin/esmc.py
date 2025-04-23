@@ -83,7 +83,9 @@ def main():
     ids = df.ID.values
 
     # Initialize the ESMC client on GPU
-    client = ESMC.from_pretrained("esmc_600m").to("cuda")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    logger.info(f"Using device: {device}")
+    client = ESMC.from_pretrained("esmc_600m").to(device)
     embeddings = {}
     start = time.time()
 
