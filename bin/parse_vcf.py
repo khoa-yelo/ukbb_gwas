@@ -12,8 +12,8 @@ import zlib
 import argparse
 from cyvcf2 import VCF
 
-DATA_PATH = os.environ.get('RAW_DATA')
-OUT_PATH = os.environ.get('PROCESSED_DATA')
+DATA_PATH = os.environ.get('RAW_DATA_EAS')
+OUT_PATH = os.environ.get('PROCESSED_DATA_EAS')
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -48,6 +48,8 @@ def main():
     vcf_file = join(args.data_path, args.vcf_file)
     out_file = join(args.out_path, args.out_file)
     sample_data = parse_vcf(vcf_file)
+    # make directory if not exist
+    os.makedirs(args.out_path, exist_ok=True)
     print("Writing to file")
     pickle_sample_data = pickle.dumps(sample_data)
     compressed_sample_data = zlib.compress(pickle_sample_data)
