@@ -10,6 +10,7 @@ import argparse
 import pickle
 import zlib
 import re
+import os
 from Bio.Seq import MutableSeq
 
 class NuChangeParser:
@@ -144,6 +145,9 @@ def main():
         group.columns = ["sample", "rna_id", "seq"]
         df_results.append(group)
     df_result = pd.concat(df_results)
+    # make directory if not exist
+    os.makedirs(os.path.dirname(args.output_file), exist_ok=True)
+    # save the result
     df_result.to_csv(args.output_file, sep="\t", index=False)
     print(f"Results saved to {args.output_file}")
 
