@@ -29,6 +29,7 @@ class VariantLoader:
 
     def get_sample_variants(self, samples: list) -> dict:
         self.database.connect()
+        print("Querying database for sample variants...")
         placeholders = ','.join('?' for _ in samples)
         query = f"SELECT * FROM {self.variant_table_name} WHERE sample IN ({placeholders})"
         df = self.database.execute_query(query, samples)
@@ -40,6 +41,7 @@ class VariantLoader:
         result = dict(df.apply(lambda row: (str(row['sample']),\
                                                 dict(zip(row['rna_id'],\
                                                 row['ID']))), axis=1).tolist())
+        print(f"Query completed. Found {len(result)} samples with variants.")
         return result
     
     def get_all_samples(self):
@@ -93,7 +95,7 @@ class ExomeLoader:
         sample_matrix = {}
         for sample, variant_map in variants_maps.items():
             sample_matrix[sample] = self.construct_matrix(variant_map)
-            print(f"matrix {sample} constructed")
+        print(f"Sample matrix constructed for {len(samples)} samples: {samples}")
         return sample_matrix
     
     def construct_matrix(self, variant_map):
