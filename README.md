@@ -24,3 +24,4 @@ graph TD
     V --> X
 
 ```
+![Figure 1](./notebooks/WeAreAfricans.png)
