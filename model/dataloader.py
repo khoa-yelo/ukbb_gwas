@@ -2,6 +2,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
 from os.path import join
+import time
 
 
 def pool_by_gene(data, gene_groups):
@@ -33,7 +34,7 @@ def pool_mean_std_from_index_groups(means, stds, index_groups):
 class ExomeDataset(Dataset):
 
     def __init__(self, indices, sample_id_map, exome_loader, label_matrix, \
-                 normalization, gene_groups, binary=False):
+                 normalization, gene_groups, binary=False, binary_labels=[]):
         """
         indices: list/array of integer sample‐IDs
         exome_loader:   your ExomeLoader instance
@@ -47,6 +48,7 @@ class ExomeDataset(Dataset):
         self.exome_loader   = exome_loader
         self.labels         = label_matrix
         self.binary = binary
+        self.binary_labels = binary_labels
         self.gene_groups = gene_groups
         mean = normalization['mean']
         std = normalization['std']
@@ -66,15 +68,23 @@ class ExomeDataset(Dataset):
     def __getitem__(self, i):
         index = self.indices[i]
         sample_id = self.sample_id_map[index]
+        tic = time.time()
         exome_embeddings = self.exome_loader.get_sample_matrix([sample_id])[str(sample_id)]
+        toc = time.time()
+        # print(f"Sample {sample_id} loading time: {toc - tic:.2f} seconds")
         # exome_embeddings = load_emb(sample_id) - self.exome_loader.get_ref_embeddings()  
         # exome_embeddings = load_emb(sample_id)
         label  = self.labels[index]
-        x = torch.from_numpy(exome_embeddings).float()
+        tic = time.time()
+        x = self.transform(exome_embeddings)
+        toc = time.time()
+        # print(f"Sample {sample_id} transform time: {toc - tic:.2f} seconds")
+        tic = time.time()
+        x = torch.from_numpy(x).float()
         y = torch.from_numpy(label).float()   # multi‐label float targets
-        
-        # sum up if binary classification
         if self.binary:
-            y = y.sum().to(torch.long)
-        x = self.transform(x)
+            assert any(self.binary_labels)
+            y = torch.tensor(self.binary_labels).long()[i]
+        toc = time.time()
+        # print(f"Sample {sample_id} torch tensor time: {toc - tic:.2f} seconds")
         return x, y
