@@ -34,7 +34,7 @@ class VariantLoader:
         placeholders = ','.join('?' for _ in samples)
         query = f"SELECT * FROM {self.variant_table_name} WHERE sample IN ({placeholders})"
         df = self.database.execute_query(query, samples)
-        print(f"Query completed. Found {len(df)} samples with variants.")
+        # print(f"Query completed. Found {len(df)} samples with variants.")
         if self.aa_variants:
             df = df.groupby("sample", as_index=False).agg({
                 "variants": self.merge_json_lists,
@@ -45,7 +45,7 @@ class VariantLoader:
                 "ID": self.merge_json_lists
             })
         self.database.close()
-        print(f"Query completed. Found {len(df)} samples with variants.")
+        # print(f"Query completed. Found {len(df)} samples with variants.")
         if df.empty:
             print("No variants found for the given samples.")
             return {}

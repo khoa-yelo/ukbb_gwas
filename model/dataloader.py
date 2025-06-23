@@ -34,7 +34,7 @@ def pool_mean_std_from_index_groups(means, stds, index_groups):
 class ExomeDataset(Dataset):
 
     def __init__(self, indices, sample_id_map, exome_loader, label_matrix, \
-                 normalization, gene_groups, binary=False, binary_labels=[]):
+                 normalization, gene_groups, binary=False, normalize=True, binary_labels=[], pool=True):
         """
         indices: list/array of integer sample‐IDs
         exome_loader:   your ExomeLoader instance
@@ -42,6 +42,7 @@ class ExomeDataset(Dataset):
         label_matrix:   numpy array of shape (n_samples, n_labels) (, 119)
         normalization:  normalization npz file
         transform:      optional transform on features
+        pool:          whether to pool embeddings by gene groups
         """
         self.indices = list(indices)
         self.sample_id_map  = sample_id_map
@@ -50,19 +51,31 @@ class ExomeDataset(Dataset):
         self.binary = binary
         self.binary_labels = binary_labels
         self.gene_groups = gene_groups
+        self.pool = pool
         mean = normalization['mean']
         std = normalization['std']
-        self.global_mean_pooled, self.global_std_pooled =\
-              pool_mean_std_from_index_groups(mean, std, self.gene_groups)
+        if pool:
+            self.global_mean_pooled, self.global_std_pooled =\
+                pool_mean_std_from_index_groups(mean, std, self.gene_groups)
+        else:
+            self.global_mean = mean
+            self.global_std = std
+        self.normalize = normalize
         
     def __len__(self):
         return len(self.indices)
 
-    def transform(self, x):
+    def transform(self, x, normalize):
         epsilon = 1e-8
-        x = pool_by_gene(x, self.gene_groups)
-        x = x - self.global_mean_pooled
-        x = x / (self.global_std_pooled + epsilon)
+        if self.pool:
+            x = pool_by_gene(x, self.gene_groups)
+            if normalize:
+                x = x - self.global_mean_pooled
+                x = x / (self.global_std_pooled + epsilon)
+        else:
+            if normalize:
+                x = x - self.global_mean
+                x = x / (self.global_std + epsilon)
         return x
         
     def __getitem__(self, i):
@@ -76,7 +89,7 @@ class ExomeDataset(Dataset):
         # exome_embeddings = load_emb(sample_id)
         label  = self.labels[index]
         tic = time.time()
-        x = self.transform(exome_embeddings)
+        x = self.transform(exome_embeddings, self.normalize)
         toc = time.time()
         # print(f"Sample {sample_id} transform time: {toc - tic:.2f} seconds")
         tic = time.time()
